@@ -1,5 +1,6 @@
 use rusty_time::Timer;
 use std::time::Duration;
+use crate::frame::{Drawable, Frame};
 
 pub struct Shot {
     pub x: usize,
@@ -23,9 +24,8 @@ impl Shot {
         if self.timer.finished() && !self.exploding {
             if self.y > 0 {
                 self.y -= 1;
-            } else {
-                self.timer.reset();
             }
+            self.timer.reset();
         }
     }
 
@@ -35,6 +35,12 @@ impl Shot {
     }
 
     pub fn dead(&self) -> bool {
-        self.exploding && self.timer.finished()
+        (self.exploding && self.timer.finished()) || self.y <= 0
+    }
+}
+
+impl Drawable for Shot {
+    fn draw(&self, frame: &mut Frame) {
+        frame[self.x][self.y] = if self.exploding { "*" } else { "|" };
     }
 }
